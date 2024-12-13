@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HOSTIP="192.168.52.25" # Replace with your local machine's IP (hostname -I)
+HOSTIP="172.27.169.219" # Replaced with the output of hostname -I
 # Export HOSTIP to make it available for docker-compose
 export HOSTIP
 docker stop $(docker ps -aq)
