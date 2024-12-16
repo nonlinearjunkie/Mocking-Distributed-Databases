@@ -1,5 +1,3 @@
-//not tested
-
 use readersDb;
 
 db.reads.createIndex({"region": 1, "id": 1})

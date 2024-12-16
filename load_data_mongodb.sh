@@ -10,6 +10,8 @@ docker exec -it mongos_router bash -c "mongosh < shard_loaders/users_loader.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/articles_loader.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_articles_shard_configurer.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/bereads_shard_configurer.js"
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_shard_configurer.js"
 
 
 echo "Waiting for shards to stabilize..."
@@ -20,11 +22,18 @@ docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection r
 sleep 5
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_articles_loader.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_loader.js"
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/bereads_loader.js"
 
 sleep 5
 
 docker exec -it mongos_router bash -c "mongoexport --db readersDb --collection reads_unsharded --out reads_full.json"
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection reads --file reads_full.json"
+
+docker exec -it mongos_router bash -c "mongoexport --db readersDb --collection bereads_unsharded --out bereads_full.json"
+docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection bereads --file bereads_full.json"
+sleep 5
+
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_loader.js"
 # docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
 
 # echo "Loading data in Mongodb collections..."
