@@ -2,7 +2,7 @@
 
 use readersDb;
 
-db.read.createIndex({"region": 1, "id": 1})
+db.reads.createIndex({"region": 1, "id": 1})
 sh.shardCollection("readersDb.reads", {"region": 1, "id": 1})
 sh.disableBalancing("readersDb.reads")
 

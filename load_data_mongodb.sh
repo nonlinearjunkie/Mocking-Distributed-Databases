@@ -11,14 +11,21 @@ docker exec -it mongos_router bash -c "mongosh < shard_loaders/articles_loader.j
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_articles_shard_configurer.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
 
+
 echo "Waiting for shards to stabilize..."
 sleep 10
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection users --file user.dat"
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection articles --file article.dat"
-docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection reads --file read.dat"
-sleep 3
+docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection reads_unsharded --file read.dat"
+sleep 5
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_articles_loader.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_loader.js"
+
+sleep 5
+
+docker exec -it mongos_router bash -c "mongoexport --db readersDb --collection reads_unsharded --out reads_full.json"
+docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection reads --file reads_full.json"
+# docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
 
 # echo "Loading data in Mongodb collections..."
 
