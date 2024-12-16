@@ -1,8 +1,9 @@
 #!/bin/bash
 
-HOSTIP=$(hostname -I | awk '{print $1}') # Replaced with the output of hostname -I
+HOSTIP=$(hostname -I | awk '{print $1}') 
 # Export HOSTIP to make it available for docker-compose
 export HOSTIP
+
 docker stop $(docker ps -aq)
 docker rm $(docker ps -aq)
 sudo rm -rf data
