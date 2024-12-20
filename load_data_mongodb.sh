@@ -35,8 +35,8 @@ sleep 5
 
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_loader.js"
 # docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
-echo "loading images and videos..."
-env HOSTIP=$(hostname -I) ./load_media.sh
+# echo "loading images and videos..."
+# env HOSTIP=$(hostname -I) ./load_media.sh
 
 # echo "Loading data in Mongodb collections..."
 
