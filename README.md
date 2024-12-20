@@ -15,19 +15,6 @@ git clone git@github.com:nonlinearjunkie/Mocking-Distributed-Databases.git
 cd Mocking-Distributed-Databases
 ```
 
-### Update the Host IP Address
-Use the following command to get your local machine's IP address:
-
-```bash
-hostname -I
-```
-
-Edit the setup_mongo_cluster.sh file and replace the HOSTIP placeholder with your local machine's IP address:
-
-```bash
-HOSTIP="192.168.52.25" # Replace with the output of hostname -I
-```
-
 ### Change Permissions of Bash Scripts
 Make the setup and data-loading scripts executable:
 

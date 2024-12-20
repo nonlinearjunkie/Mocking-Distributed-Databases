@@ -12,17 +12,21 @@ docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_articles_shar
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/bereads_shard_configurer.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_shard_configurer.js"
-
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_shard_configurer.js"
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/pop_rank_shard_configurer.js"
 
 echo "Waiting for shards to stabilize..."
 sleep 10
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection users --file user.dat"
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection articles --file article.dat"
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection reads_unsharded --file read.dat"
+
 sleep 5
+
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_articles_loader.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_loader.js"
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/bereads_loader.js"
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/pop_rank_loader.js"
 
 sleep 5
 
@@ -34,6 +38,9 @@ docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection b
 sleep 5
 
 docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_loader.js"
+
+docker exec -it mongos_router bash -c "mongoexport --db readersDb --collection pop_ranks_unsharded --out pop_ranks_full.json"
+docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection pop_ranks --file pop_ranks_full.json"
 # docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
 # echo "loading images and videos..."
 # env HOSTIP=$(hostname -I) ./load_media.sh
