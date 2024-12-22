@@ -21,6 +21,7 @@ mkdir -p data/shard1_replica2
 mkdir -p data/shard2_replica1
 mkdir -p data/shard2_replica2
 
+
 # Start all containers
 echo "Starting MongoDB containers..."
 cd mongodb

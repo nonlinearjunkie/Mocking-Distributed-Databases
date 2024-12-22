@@ -41,13 +41,9 @@ docker exec -it mongos_router bash -c "mongosh < shard_loaders/sci_bereads_loade
 
 docker exec -it mongos_router bash -c "mongoexport --db readersDb --collection pop_ranks_unsharded --out pop_ranks_full.json"
 docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection pop_ranks --file pop_ranks_full.json"
-# docker exec -it mongos_router bash -c "mongosh < shard_loaders/reads_shard_configurer.js"
-# echo "loading images and videos..."
-# env HOSTIP=$(hostname -I) ./load_media.sh
 
-# echo "Loading data in Mongodb collections..."
+sleep 5
 
-
-# docker exec -it mongos_router bash -c "mongoimport --db readersDb --collection read --file read.dat"
+docker exec -it mongos_router bash -c "mongosh < shard_loaders/drop_tmp_dbs.js"
 
 echo "Data loaded into MongoDb collections...."

@@ -40,6 +40,25 @@ Once the cluster is running, use the following script to load the data into Mong
 ./load_data_mongodb.sh
 ```
 
+### Bulk Load files
+Use the following script to bulk load the article files into MongoDB Grid FS:
+
+```bash
+python upload_media.py
+```
+
+### Run background tasks to update sci_articles collection and popular ranks on update
+
+```bash
+python refresh_article_update.py
+python refresh_read_update.py
+```
+
+### Start the fastpi server:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 20000
+```
 
 
 ## Notes
