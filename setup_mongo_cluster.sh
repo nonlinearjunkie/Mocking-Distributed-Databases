@@ -74,3 +74,7 @@ docker exec -it mongos_router mongosh --eval "sh.addShard('shard2ReplSet/${HOSTI
 
 
 echo "MongoDB Sharded Cluster is successfully set up!"
+
+docker run -d -p 6379:6379 redis/redis-stack:latest
+
+docker run -d -p 27051:27017 mongo:latest
