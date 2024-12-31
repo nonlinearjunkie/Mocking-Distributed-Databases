@@ -7,17 +7,35 @@ from bson import Int64
 from fastapi.responses import StreamingResponse
 import gridfs
 import os
+import redis
+import json
 
 # MongoDB connection
-client = MongoClient("mongodb://localhost:27041/")  # Replace with your MongoDB URI
-db = client["readersDb"]  # Replace with your database name
+client = MongoClient("mongodb://localhost:27041/")  
+MEDIA_FILES_MONGO_URI = "mongodb://localhost:27051" 
+media_client = MongoClient(MEDIA_FILES_MONGO_URI)
+db = client["readersDb"] 
+media_db = media_client["readersDb"]  
 users_collection = db["users"] 
 articles_collection = db["articles"] 
 pop_ranks_collection = db["pop_ranks"]
-fs = gridfs.GridFS(db)
+fs = gridfs.GridFS(media_db)
+redis_client = redis.StrictRedis(host="localhost", port=6379, db=0)
 
 # Initialize FastAPI app
 app = FastAPI()
+
+# Cache GET request responses using Redis
+def get_cache(key: str):
+    """Retrieve cached data from Redis."""
+    cached_data = redis_client.get(key)
+    if cached_data:
+        return json.loads(cached_data)
+    return None
+
+def set_cache(key: str, data: dict, ttl: int = 3600):
+    """Set data in Redis with an optional time-to-live."""
+    redis_client.setex(key, ttl, json.dumps(data))
 
 # Pydantic models for request validation
 class User(BaseModel):
@@ -194,6 +212,39 @@ async def get_document_by_granularity_and_timestamp(temporal_granularity: str, t
     document["_id"] = str(document["_id"])
     return document
 
+# @app.get("/files/{filename}")
+# async def stream_file(filename: str):
+#     """
+#     Stream a file from GridFS to the client.
+#     """
+
+#     try:
+#         # Retrieve the file from GridFS
+#         file = fs.get_last_version(filename)
+
+#         # Generate a streaming response
+#         def file_iterator():
+#             while chunk := file.read(1024 * 1024):  # Read in 1 MB chunks
+#                 yield chunk
+
+#         # Determine the content type based on file extension
+#         ext = os.path.splitext(filename)[-1].lower()
+#         content_type = {
+#             ".jpg": "image/jpeg",
+#             ".jpeg": "image/jpeg",
+#             ".png": "image/png",
+#             ".gif": "image/gif",
+#             ".mp4": "video/mp4",
+#             ".txt": "text/plain",
+#             ".flv": "video/x-flv",
+#         }.get(ext, "application/octet-stream")  # Default to binary data if type unknown
+
+#         # Create and return the StreamingResponse
+#         return StreamingResponse(file_iterator(), media_type=content_type)
+    
+#     except gridfs.errors.NoFile:
+#         raise HTTPException(status_code=404, detail=f"File '{filename}' not found in GridFS.")
+
 @app.get("/files/{filename}")
 async def stream_file(filename: str):
     """
@@ -218,10 +269,13 @@ async def stream_file(filename: str):
             ".gif": "image/gif",
             ".mp4": "video/mp4",
             ".txt": "text/plain",
+            ".flv": "video/x-flv",
         }.get(ext, "application/octet-stream")  # Default to binary data if type unknown
 
-        # Create and return the StreamingResponse
-        return StreamingResponse(file_iterator(), media_type=content_type)
+        # Create and return the StreamingResponse without Content-Disposition
+        response = StreamingResponse(file_iterator(), media_type=content_type)
+        response.headers["Content-Disposition"] = "inline"
+        return response
     
     except gridfs.errors.NoFile:
         raise HTTPException(status_code=404, detail=f"File '{filename}' not found in GridFS.")

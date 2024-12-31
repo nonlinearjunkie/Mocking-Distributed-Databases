@@ -2,14 +2,15 @@ import os
 from pymongo import MongoClient
 import gridfs
 
-# MongoDB connection details
-MONGO_URI = "mongodb://localhost:27041"  
+# MongoDB connection details 
 DATABASE_NAME = "readersDb"  
 ARTICLES_DIR_PATH = "db-generation/test_articles/"
 
+MEDIA_FILES_MONGO_URI = "mongodb://localhost:27051" 
 
-client = MongoClient(MONGO_URI)
-db = client[DATABASE_NAME]
+
+media_client = MongoClient(MEDIA_FILES_MONGO_URI)
+db = media_client[DATABASE_NAME]
 bucket = gridfs.GridFS(db)
 
 def bulk_upload_images(directory):
